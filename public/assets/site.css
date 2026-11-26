@@ -192,3 +192,9 @@ a.lnkcard .more{display:inline-block;margin-top:14px;color:var(--gold);font-weig
 a.lnkcard .more::after{content:" \2192"}
 
 a.lnkcard,a.lnkcard *{text-decoration:none!important}
+
+/* myth / fact cards */
+.mf .tag{color:#ff9d8f}
+.mf .tag.fact{color:var(--gold);margin-top:16px}
+.mf h3{font-size:20px}
+.mf p{color:var(--muted)}
