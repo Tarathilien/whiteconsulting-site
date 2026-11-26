@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Constellation journey (prototype)</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+html,body{height:100%;overflow:hidden;background:#050a17}
+#sky{position:fixed;inset:0;width:100%;height:100%;display:block}
+.hud{position:fixed;left:0;right:0;top:0;display:flex;align-items:center;gap:12px;padding:14px 18px;z-index:3}
+.hud img{width:34px}.hud b{font-family:var(--serif);font-size:18px}
+.hud .proto{margin-left:auto;font-size:12px;border:1px solid var(--line);border-radius:99px;padding:4px 10px;color:var(--muted)}
+.card{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);width:min(640px,calc(100% - 28px));background:rgba(12,22,42,.9);border:1px solid var(--line);border-radius:18px;padding:20px 22px;z-index:3;max-height:48vh;overflow:auto;backdrop-filter:blur(6px);transition:opacity .5s,transform .5s}
+.card.off{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(16px)}
+.qn{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px}
+.qt{font-family:var(--serif);font-weight:700;font-size:clamp(20px,3.4vw,26px);line-height:1.25;margin:0 0 16px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row button,.row a{flex:1;min-width:130px;text-align:center;padding:13px 14px;border-radius:11px;border:1.5px solid var(--gold);background:transparent;color:var(--gold);font:inherit;font-weight:600;font-size:16px;cursor:pointer;text-decoration:none}
+.row button:hover,.row a:hover,.row .solid{background:var(--gold);color:#0B1426}
+.skip{margin-top:12px;background:none;border:0;color:var(--muted);font:inherit;font-size:14px;text-decoration:underline;cursor:pointer;padding:0}
+.path{margin:6px 0 14px;padding:0;list-style:none}
+.path li{padding:9px 0 9px 14px;border-left:3px solid #e0a23a;margin:8px 0;font-size:15.5px;line-height:1.45}
+.path li b{display:block}.path li span{color:var(--muted)}
+.fine{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+</style></head><body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="hud"><img src="/assets/img/logo.png" alt=""><b>Jared White Consulting</b><span class="proto">Prototype</span></div>
+<div class="card" id="card" aria-live="polite"></div>
+<script>
+(function(){
+var Q=[
+["Do you know who owns and controls your domain name (the address your website and email use)?","Domain control","If you can’t log in to the domain account, you can lose your website and email overnight."],
+["Do at least two trusted people have admin access to your email and website accounts?","Second admin","When one person holds every login, a departure or a lost password can stop the organization."],
+["Is multi-factor authentication turned on for email and other key accounts?","Multi-factor","Without it, a stolen password alone is enough to get into your accounts."],
+["Are your important files backed up, and have you tested restoring them?","Backups","A backup you have never restored from is a hope, not a plan."],
+["When someone leaves, is their access removed within a week?","Offboarding","Former staff and volunteers can keep access to your data long after they are gone."],
+["Are computers and software updated on a schedule instead of whenever they nag you?","Updates","Missed updates are one of the easiest ways for problems to get in."],
+["Do you keep a current list of your computers, software subscriptions, and who uses them?","Inventory","Without a list, you pay for software nobody uses and miss equipment that needs replacing."],
+["Do you have a technology budget or plan for the next 12 months?","Budget","Surprise replacements and renewals land on the budget at the worst moments."]];
+var PRIORITY=[0,2,1,4,3,5,6,7],BOOK="https://calendar.app.google/3gdVnfZjGvbq7phD7";
+var S=[[-700,190],[-490,-70],[-260,110],[-60,-190],[170,70],[390,-130],[610,90],[790,-90]];
+var c=document.getElementById("sky"),g=c.getContext("2d"),card=document.getElementById("card"),W,H,dpr=Math.min(devicePixelRatio||1,1.5);
+var reduce=matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+var cam={x:0,y:0,z:.5},px=0,py=0,anim=null,idx=-1,ans=[],lines=[],seed=11,layers=[],fit=.5,phase="intro",t0=0,last=0;
+function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
+function size(){W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;g.setTransform(dpr,0,0,dpr,0,0);fit=Math.min(W*.8/1560,H*.34/330);if(phase==="intro")cam.z=fit}
+function build(){var n=[230,170,120],d=[.15,.4,.7],r=[.7,1.1,1.7];for(var l=0;l<3;l++){var a=[];for(var i=0;i<n[l];i++)a.push({x:(rnd()-.5)*5000,y:(rnd()-.5)*3200,r:r[l]*(.6+rnd()*.9),p:rnd()*6.28});layers.push({d:d[l],s:a})}}
+function ease(k){return k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2}
+function fly(to,dur,dip,cb){var a={x:cam.x,y:cam.y,z:cam.z};anim={a:a,b:to,t:0,dur:reduce?.01:dur,dip:reduce?0:dip,cb:cb}}
+function focus(i){return{x:S[i][0],y:S[i][1],z:3.1}}
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function intro(){card.className="card";card.innerHTML='<div class="qn">The 60-second tech check</div><p class="qt">Eight stars. One question each. Fly through them and see your path.</p><div class="row"><button class="solid" id="go">Begin the journey</button></div>';document.getElementById("go").onclick=begin}
+function begin(){card.className="card off";phase="fly";idx=0;fly(focus(0),2.6,1.1,ask)}
+function ask(){phase="ask";card.className="card";card.innerHTML='<div class="qn">Star '+(idx+1)+' of 8</div><p class="qt">'+esc(Q[idx][0])+'</p><div class="row"><button data-v="1">Yes</button><button data-v="0">No or not sure</button></div>';
+ [].forEach.call(card.querySelectorAll("button"),function(b){b.onclick=function(){answer(b.getAttribute("data-v")==="1")}})}
+function answer(v){ans[idx]=v;card.className="card off";var i=idx;
+ if(i<7){idx++;phase="fly";anim=null;var to=focus(idx);var a={x:cam.x,y:cam.y,z:cam.z};anim={a:a,b:to,t:0,dur:reduce?.01:2.0,dip:reduce?0:1.0,seg:i,cb:ask}}
+ else{phase="fly";lines[7]=1;fly({x:0,y:0,z:fit},3.2,0,finish)}}
+function finish(){phase="done";var gaps=PRIORITY.filter(function(i){return !ans[i]});
+ var h='<div class="qn">Your constellation</div><p class="qt">'+(8-gaps.length)+' of 8 stars are lit.'+(gaps.length?' Here is your path, in order.':' Every star is lit.')+'</p>';
+ if(gaps.length){h+='<ol class="path">';gaps.slice(0,3).forEach(function(i){h+='<li><b>'+esc(Q[i][1])+'</b><span>'+esc(Q[i][2])+'</span></li>'});h+='</ol>';if(gaps.length>3)h+='<p class="fine">Plus '+(gaps.length-3)+' more on the full path.</p>'}
+ h+='<div class="row"><button class="solid" id="em">Email me this path</button><a href="'+BOOK+'">Book a free call</a></div><p class="fine">Prototype: the email button does nothing yet.</p>';
+ card.className="card";card.innerHTML=h;document.getElementById("em").onclick=function(){this.textContent="Prototype only"}}
+function glow(x,y,r,col,a){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col.replace("A",a));gr.addColorStop(1,col.replace("A",0));g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,6.283);g.fill()}
+function frame(ts){requestAnimationFrame(frame);if(document.hidden)return;var dt=Math.min(.05,(ts-last)/1000||0);last=ts;var t=(ts-t0)/1000;
+ if(anim){anim.t+=dt/anim.dur;var k=Math.min(1,anim.t),e=ease(k);cam.x=anim.a.x+(anim.b.x-anim.a.x)*e;cam.y=anim.a.y+(anim.b.y-anim.a.y)*e;cam.z=anim.a.z+(anim.b.z-anim.a.z)*e-anim.dip*Math.sin(Math.PI*k)*Math.min(1,anim.a.z);
+  if(anim.seg!=null)lines[anim.seg]=e;if(k>=1){if(anim.seg!=null)lines[anim.seg]=1;var cb=anim.cb;anim=null;if(cb)cb()}}
+ var ay=H*.34,ax=W/2;
+ var gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,"#050a17");gr.addColorStop(1,"#0f1c38");g.fillStyle=gr;g.fillRect(0,0,W,H);
+ for(var l=0;l<3;l++){var L=layers[l],sc=1+(cam.z-1)*L.d;sc=Math.max(.25,sc);g.fillStyle="#fff";
+  for(var i=0;i<L.s.length;i++){var s=L.s[i];var x=ax+(s.x-(cam.x+px)*L.d)*sc,y=ay+(s.y-(cam.y+py)*L.d)*sc;if(x<-20||x>W+20||y<-20||y>H+20)continue;
+   g.globalAlpha=(.35+l*.25)*(reduce?1:.7+.3*Math.sin(t*1.3+s.p));g.beginPath();g.arc(x,y,s.r*(.8+.2*sc),0,6.283);g.fill()}}
+ g.globalAlpha=1;var z=cam.z;
+ function P(i){return[ax+(S[i][0]-cam.x)*z,ay+(S[i][1]-cam.y)*z]}
+ // faint guide before reveal
+ g.lineWidth=1;
+ for(var j=0;j<7;j++){var a=P(j),b=P(j+1);g.strokeStyle="rgba(150,170,210,.14)";g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();
+  var p=lines[j]||0;if(p>0){g.strokeStyle="rgba(226,188,104,.85)";g.lineWidth=1.6;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(a[0]+(b[0]-a[0])*p,a[1]+(b[1]-a[1])*p);g.stroke();g.lineWidth=1}}
+ for(var i=0;i<8;i++){var q=P(i),r=Math.max(2.2,Math.min(9,2.2*z)),has=ans[i]!==undefined,cur=(i===idx&&phase==="ask");
+  if(!has){g.fillStyle=cur?"#fff":"rgba(220,230,255,.7)";g.globalAlpha=cur?1:.8;g.beginPath();g.arc(q[0],q[1],r,0,6.283);g.fill();g.globalAlpha=1;
+   if(cur||phase==="intro"){glow(q[0],q[1],r*(cur?7+Math.sin(t*3)*1.2:4),"rgba(226,188,104,A)",cur?.55:.25)}}
+  else if(ans[i]){glow(q[0],q[1],r*6,"rgba(226,188,104,A)",.6);g.fillStyle="#f1cd7c";g.beginPath();g.arc(q[0],q[1],r*1.15,0,6.283);g.fill()}
+  else{var pu=.75+.25*Math.sin(t*3+i);glow(q[0],q[1],r*6*pu,"rgba(224,140,58,A)",.5);g.strokeStyle="#f0a24a";g.lineWidth=1.8;g.beginPath();g.arc(q[0],q[1],r*1.5*pu,0,6.283);g.stroke();g.fillStyle="#f0a24a";g.beginPath();g.arc(q[0],q[1],r*.6,0,6.283);g.fill();g.lineWidth=1}
+  if(phase==="done"||(has&&z<1.2)){g.fillStyle="rgba(230,236,248,.9)";g.font="600 "+Math.max(11,Math.min(14,z*18))+"px Inter,sans-serif";g.textAlign="center";g.fillText(Q[i][1],q[0],q[1]+(i%2?-18:26))}}
+ if(!reduce&&!anim){}
+}
+addEventListener("resize",size);
+addEventListener("pointermove",function(e){px=(e.clientX/W-.5)*70;py=(e.clientY/H-.5)*40});
+build();size();intro();requestAnimationFrame(function(ts){t0=ts;last=ts;frame(ts)});
+})();
+</script></body></html>
