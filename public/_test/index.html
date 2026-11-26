@@ -13,29 +13,34 @@ pre{background:#111c33;padding:12px;border-radius:6px;white-space:pre-wrap;word-
 <body>
 <h1>Backend POST test</h1>
 <p>Sends test submissions from this origin. Test addresses only.</p>
-<button id="q1">Quiz: JSON as text/plain</button>
-<button id="q2">Quiz: form-encoded</button>
-<button id="t1">Tech check: JSON as text/plain</button>
-<button id="t2">Tech check: form-encoded</button>
+<button id="plan">Tech check: build plan (no email, no sheet row)</button>
+<button id="email">Tech check: email plan (+test2)</button>
+<button id="quiz">Quiz: full submit (+test3)</button>
 <pre id="out">Ready.</pre>
 <script>
 var QUIZ="https://script.google.com/macros/s/AKfycbxodVJniJyPA3FdbvwVbN_rg6ROFeX9YhcNDCxNRkwogw_J7_M9CK3VmIgfMjbseqM6/exec";
 var PLAN="https://script.google.com/macros/s/AKfycbxNfdW7RQs2vMLk15JgjQvBICRjdt6DZB6HC8109dbT2JqrcdbOFCsuDmu68IiftiqQ/exec";
 var out=document.getElementById("out");
+var vid=String(Date.now())+"."+Math.floor(Math.random()*1e6);
+var token="";
 function log(s){out.textContent+="\n"+s;}
-function quizData(n){return {organization:"Test Org",name:"Jared WhiteTest",email:"jaredwhite2005+test"+n+"@gmail.com",orgType:"nonprofit",staffCount:"1-9",gate:"no",dataTypes:["children"],funding:["donations"],aiTools:"",consent:true,website:""};}
-function planData(n){return {name:"Jared WhiteTest",email:"jaredwhite2005+test"+n+"@gmail.com",organization:"Test Org",consent:true,website:""};}
-function send(label,url,data,mode){
-  var opts={method:"POST"};
-  if(mode==="json"){opts.headers={"Content-Type":"text/plain;charset=utf-8"};opts.body=JSON.stringify(data);}
-  else{var p=new URLSearchParams();for(var k in data){p.append(k,Array.isArray(data[k])?data[k].join(", "):data[k]);}opts.body=p;}
+function post(label,url,data){
   log("-> "+label);
-  fetch(url,opts).then(function(r){return r.text().then(function(t){log("<- "+label+" status "+r.status+": "+t.slice(0,400));});}).catch(function(e){log("<- "+label+" FAILED: "+e);});
+  return fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(data)})
+    .then(function(r){return r.text().then(function(t){log("<- "+label+" status "+r.status+": "+t.slice(0,600));try{return JSON.parse(t);}catch(e){return null;}});})
+    .catch(function(e){log("<- "+label+" FAILED: "+e);});
 }
-document.getElementById("q1").onclick=function(){send("quiz json",QUIZ,quizData(1),"json");};
-document.getElementById("q2").onclick=function(){send("quiz form",QUIZ,quizData(1),"form");};
-document.getElementById("t1").onclick=function(){send("tech json",PLAN,planData(2),"json");};
-document.getElementById("t2").onclick=function(){send("tech form",PLAN,planData(2),"form");};
+document.getElementById("plan").onclick=function(){
+  post("plan",PLAN,{action:"plan",hp:"",vid:vid,org:"Nonprofit",platform:"Google Workspace",size:"6 to 20",note:"Test note",gaps:[0,2]}).then(function(j){if(j&&j.token){token=j.token;log("token saved");}});
+};
+document.getElementById("email").onclick=function(){
+  if(!token){log("Run the plan test first.");return;}
+  post("email",PLAN,{action:"email",hp:"",vid:vid,token:token,email:"jaredwhite2005+test2@gmail.com",name:"Jared WhiteTest",orgName:"Test Org",phone:""});
+};
+document.getElementById("quiz").onclick=function(){
+  var a={};for(var i=1;i<=12;i++)a["q"+i]="partly";
+  post("quiz",QUIZ,{website:"",consent:true,orgName:"Test Org",contactName:"Jared WhiteTest",email:"jaredwhite2005+test3@gmail.com",orgType:"nonprofit",staffCount:"1-9",gate:"no",answers:a,dataTypes:["children"],funding:["donations"],tools:""});
+};
 </script>
 </body>
 </html>
