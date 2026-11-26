@@ -46,26 +46,6 @@ var CONFIG = {
     });
   });
 
-  /* ---------- governance explorer ---------- */
-  var ex = $("explorer");
-  if (ex) {
-    var SIT = [
-      ["Staff already use ChatGPT", ["Find out which AI tools people use, including AI built into software you already own.", "See what information is going into them and who could be affected.", "Write a one-page approved-use policy and have every staff member acknowledge it."]],
-      ["A funder or board is asking", ["Map where AI touches your work today.", "Compare your practices with what a funder or board would expect to see.", "Put a written policy and a training record in place that you can show."]],
-      ["We want to start using AI", ["Pick two or three tasks where AI would save real time.", "Check what data those tasks involve and how much risk they carry.", "Set the rules first, then roll out with short training so everyone starts the same way."]]
-    ];
-    var NAMES = ["Discover", "Assess", "Set policy"];
-    var btns = ex.querySelectorAll(".sit button"), out = ex.querySelector(".steps");
-    var show = function (n) {
-      each(btns, function (b, i) { b.setAttribute("aria-pressed", i === n ? "true" : "false"); });
-      var h = "";
-      for (var k = 0; k < 3; k++) h += '<div class="step"><b>' + (k + 1) + ". " + NAMES[k] + "</b><span>" + esc(SIT[n][1][k]) + "</span></div>";
-      out.innerHTML = h;
-    };
-    each(btns, function (b, i) { b.onclick = function () { show(i); }; });
-    show(0);
-  }
-
   /* ---------- 60-second tech check ---------- */
   var tc = $("techcheck");
   if (tc) {
