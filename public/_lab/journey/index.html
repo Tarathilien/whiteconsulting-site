@@ -66,7 +66,7 @@ function answer(v){ans[idx]=v;card.className="card off";var i=idx;
  if(!v){var hh=heading;[.75,-.75].forEach(function(o,k){var L=130+k*30;B.push({from:i,x:S[i][0]+Math.cos(hh+o)*L,y:S[i][1]+Math.sin(hh+o)*L,t0:performance.now()/1000})})}
  if(i<7){S.push(nextPos(i,v));idx++;phase="fly";anim={a:{x:cam.x,y:cam.y,z:cam.z},b:focus(idx),t:0,dur:reduce?.01:2.0,dip:reduce?0:1.0,seg:i,cb:ask}}
  else{phase="fly";lines[7]=1;var mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;S.concat(B.map(function(b){return[b.x,b.y]})).forEach(function(p){mnx=Math.min(mnx,p[0]);mxx=Math.max(mxx,p[0]);mny=Math.min(mny,p[1]);mxy=Math.max(mxy,p[1])});
-  var hw=(mxx-mnx)/2+110,hh2=(mxy-mny)/2+90,z=Math.min(W*.46/hw,H*.29/hh2);fly({x:(mnx+mxx)/2,y:(mny+mxy)/2,z:z},3.2,0,finish)}}
+  var hw=(mxx-mnx)/2+110,hh2=(mxy-mny)/2+90,z=Math.min(W*.46/hw,H*.2/hh2);fly({x:(mnx+mxx)/2,y:(mny+mxy)/2,z:z},3.2,0,finish)}}
 function finish(){phase="done";var gaps=PRIORITY.filter(function(i){return !ans[i]});
  var pairs=[];for(var i=0;i<8;i++)for(var j=i+2;j<8;j++)pairs.push([i,j,Math.hypot(S[i][0]-S[j][0],S[i][1]-S[j][1])]);
  pairs.sort(function(a,b){return a[2]-b[2]});X=pairs.filter(function(p){return p[2]<560}).slice(0,6);
