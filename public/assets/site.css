@@ -183,3 +183,9 @@ footer a{color:var(--ink)}
 .cx .full{margin-top:12px;display:grid;gap:12px}
 .cx .full a.gold{background:var(--gold);color:#0B1426;border-color:var(--gold)}
 .cx .full a.line{background:transparent;border-color:var(--gold);color:var(--gold)}
+
+/* clickable cards */
+a.lnkcard{display:block;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+a.lnkcard:hover{border-color:var(--gold);transform:translateY(-2px);color:inherit}
+a.lnkcard .more{display:inline-block;margin-top:14px;color:var(--gold);font-weight:600}
+a.lnkcard .more::after{content:" \2192"}
