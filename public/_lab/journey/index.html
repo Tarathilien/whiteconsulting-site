@@ -39,26 +39,37 @@ var Q=[
 ["Do you keep a current list of your computers, software subscriptions, and who uses them?","Inventory","Without a list, you pay for software nobody uses and miss equipment that needs replacing."],
 ["Do you have a technology budget or plan for the next 12 months?","Budget","Surprise replacements and renewals land on the budget at the worst moments."]];
 var PRIORITY=[0,2,1,4,3,5,6,7],BOOK="https://calendar.app.google/3gdVnfZjGvbq7phD7";
-var S=[],X=[[0,2],[1,3],[2,4],[3,5],[4,6],[5,7],[1,5],[0,4],[2,6]],webT=0;
-for(var k=0;k<8;k++){var an=3.6+k*1.0,rr=600-k*62;S.push([Math.round(rr*Math.cos(an)),Math.round(rr*Math.sin(an)*.8)])}
+var S=[[0,0]],B=[],X=[],webT=0,heading=.6;
 var c=document.getElementById("sky"),g=c.getContext("2d"),card=document.getElementById("card"),W,H,dpr=Math.min(devicePixelRatio||1,1.5);
 var reduce=matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-var cam={x:0,y:0,z:.5},px=0,py=0,anim=null,idx=-1,ans=[],lines=[],seed=11,layers=[],fit=.5,phase="intro",t0=0,last=0;
+var cam={x:0,y:0,z:1.25},px=0,py=0,anim=null,idx=-1,ans=[],lines=[],seed=11,layers=[],fit=.5,phase="intro",t0=0,last=0;
 function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
-function size(){W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;g.setTransform(dpr,0,0,dpr,0,0);fit=Math.min(W*.4/650,H*.27/520);if(phase==="intro")cam.z=fit}
+function size(){W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;g.setTransform(dpr,0,0,dpr,0,0);fit=.5}
 function build(){var n=[230,170,120],d=[.15,.4,.7],r=[.7,1.1,1.7];for(var l=0;l<3;l++){var a=[];for(var i=0;i<n[l];i++)a.push({x:(rnd()-.5)*5000,y:(rnd()-.5)*3200,r:r[l]*(.6+rnd()*.9),p:rnd()*6.28});layers.push({d:d[l],s:a})}}
 function ease(k){return k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2}
 function fly(to,dur,dip,cb){var a={x:cam.x,y:cam.y,z:cam.z};anim={a:a,b:to,t:0,dur:reduce?.01:dur,dip:reduce?0:dip,cb:cb}}
 function focus(i){return{x:S[i][0],y:S[i][1],z:3.1}}
 function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
 function intro(){card.className="card";card.innerHTML='<div class="qn">The 60-second tech check</div><p class="qt">Eight stars. One question each. Fly through them and see your path.</p><div class="row"><button class="solid" id="go">Begin the journey</button></div>';document.getElementById("go").onclick=begin}
-function begin(){card.className="card off";phase="fly";idx=0;fly(focus(0),2.6,1.1,ask)}
+function begin(){card.className="card off";phase="fly";idx=0;fly(focus(0),2.4,.5,ask)}
 function ask(){phase="ask";card.className="card";card.innerHTML='<div class="qn">Star '+(idx+1)+' of 8</div><p class="qt">'+esc(Q[idx][0])+'</p><div class="row"><button data-v="1">Yes</button><button data-v="0">No or not sure</button></div>';
  [].forEach.call(card.querySelectorAll("button"),function(b){b.onclick=function(){answer(b.getAttribute("data-v")==="1")}})}
+function nextPos(i,yes){
+ var side=(i%2?1:-1),cx=0,cy=0;S.forEach(function(p){cx+=p[0];cy+=p[1]});cx/=S.length;cy/=S.length;
+ var h=heading+(yes?side*.32:-side*1.15),len=yes?270:310,p=S[i];
+ var dx=p[0]-cx,dy=p[1]-cy;if(Math.sqrt(dx*dx+dy*dy)>620){var to=Math.atan2(cy-p[1],cx-p[0]),d=Math.atan2(Math.sin(to-h),Math.cos(to-h));h+=d*.6}
+ for(var tries=0;tries<12;tries++){var nx=p[0]+Math.cos(h)*len,ny=p[1]+Math.sin(h)*len,ok=true;
+  for(var j=0;j<S.length;j++){if(Math.hypot(S[j][0]-nx,S[j][1]-ny)<170){ok=false;break}}
+  if(ok)break;h+=.5}
+ heading=h;return[Math.round(nx),Math.round(ny)]}
 function answer(v){ans[idx]=v;card.className="card off";var i=idx;
- if(i<7){idx++;phase="fly";anim=null;var to=focus(idx);var a={x:cam.x,y:cam.y,z:cam.z};anim={a:a,b:to,t:0,dur:reduce?.01:2.0,dip:reduce?0:1.0,seg:i,cb:ask}}
- else{phase="fly";lines[7]=1;fly({x:0,y:0,z:fit},3.2,0,finish)}}
+ if(!v){var hh=heading;[.75,-.75].forEach(function(o,k){var L=130+k*30;B.push({from:i,x:S[i][0]+Math.cos(hh+o)*L,y:S[i][1]+Math.sin(hh+o)*L,t0:performance.now()/1000})})}
+ if(i<7){S.push(nextPos(i,v));idx++;phase="fly";anim={a:{x:cam.x,y:cam.y,z:cam.z},b:focus(idx),t:0,dur:reduce?.01:2.0,dip:reduce?0:1.0,seg:i,cb:ask}}
+ else{phase="fly";lines[7]=1;var mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;S.concat(B.map(function(b){return[b.x,b.y]})).forEach(function(p){mnx=Math.min(mnx,p[0]);mxx=Math.max(mxx,p[0]);mny=Math.min(mny,p[1]);mxy=Math.max(mxy,p[1])});
+  var hw=(mxx-mnx)/2+110,hh2=(mxy-mny)/2+90,z=Math.min(W*.46/hw,H*.29/hh2);fly({x:(mnx+mxx)/2,y:(mny+mxy)/2,z:z},3.2,0,finish)}}
 function finish(){phase="done";var gaps=PRIORITY.filter(function(i){return !ans[i]});
+ var pairs=[];for(var i=0;i<8;i++)for(var j=i+2;j<8;j++)pairs.push([i,j,Math.hypot(S[i][0]-S[j][0],S[i][1]-S[j][1])]);
+ pairs.sort(function(a,b){return a[2]-b[2]});X=pairs.filter(function(p){return p[2]<560}).slice(0,6);
  var h='<div class="qn">Your constellation</div><p class="qt">'+(8-gaps.length)+' of 8 stars are lit.'+(gaps.length?' Here is your path, in order.':' Every star is lit.')+'</p>';
  if(gaps.length){h+='<ol class="path">';gaps.slice(0,3).forEach(function(i){h+='<li><b>'+esc(Q[i][1])+'</b><span>'+esc(Q[i][2])+'</span></li>'});h+='</ol>';if(gaps.length>3)h+='<p class="fine">Plus '+(gaps.length-3)+' more on the full path.</p>'}
  h+='<div class="row"><button class="solid" id="em">Email me this path</button><a href="'+BOOK+'">Book a free call</a></div><p class="fine">Prototype: the email button does nothing yet.</p>';
@@ -74,17 +85,21 @@ function frame(ts){requestAnimationFrame(frame);if(document.hidden)return;var dt
    g.globalAlpha=(.35+l*.25)*(reduce?1:.7+.3*Math.sin(t*1.3+s.p));g.beginPath();g.arc(x,y,s.r*(.8+.2*sc),0,6.283);g.fill()}}
  g.globalAlpha=1;var z=cam.z;
  function P(i){return[ax+(S[i][0]-cam.x)*z,ay+(S[i][1]-cam.y)*z]}
- // faint guide before reveal
+ g.lineWidth=1.6;
+ for(var j=0;j<S.length-1;j++){var p=lines[j]||0;if(p<=0)continue;var a=P(j),b=P(j+1);g.strokeStyle="rgba(226,188,104,.85)";g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(a[0]+(b[0]-a[0])*p,a[1]+(b[1]-a[1])*p);g.stroke()}
  g.lineWidth=1;
- for(var j=0;j<7;j++){var a=P(j),b=P(j+1);g.strokeStyle="rgba(150,170,210,.14)";g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();
-  var p=lines[j]||0;if(p>0){g.strokeStyle="rgba(226,188,104,.85)";g.lineWidth=1.6;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(a[0]+(b[0]-a[0])*p,a[1]+(b[1]-a[1])*p);g.stroke();g.lineWidth=1}}
- if(webT>0){g.strokeStyle="rgba(226,188,104,"+(.28*webT)+")";g.lineWidth=1;for(var j=0;j<X.length;j++){var a=P(X[j][0]),b=P(X[j][1]);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(a[0]+(b[0]-a[0])*webT,a[1]+(b[1]-a[1])*webT);g.stroke()}}
- for(var i=0;i<8;i++){var q=P(i),r=Math.max(2.2,Math.min(9,2.2*z)),has=ans[i]!==undefined,cur=(i===idx&&phase==="ask");
-  if(!has){g.fillStyle=cur?"#fff":"rgba(220,230,255,.7)";g.globalAlpha=cur?1:.8;g.beginPath();g.arc(q[0],q[1],r,0,6.283);g.fill();g.globalAlpha=1;
-   if(cur||phase==="intro"){glow(q[0],q[1],r*(cur?7+Math.sin(t*3)*1.2:4),"rgba(226,188,104,A)",cur?.55:.25)}}
+ if(webT>0){g.strokeStyle="rgba(226,188,104,"+(.28*webT)+")";for(var j=0;j<X.length;j++){var a=P(X[j][0]),b=P(X[j][1]);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(a[0]+(b[0]-a[0])*webT,a[1]+(b[1]-a[1])*webT);g.stroke()}}
+ var now=ts/1000;
+ for(var k=0;k<B.length;k++){var bb=B[k],al=Math.min(1,Math.max(0,(now-bb.t0)/1.4)),a=P(bb.from),bx=ax+(bb.x-cam.x)*z,by=ay+(bb.y-cam.y)*z;
+  g.globalAlpha=.65*al;g.strokeStyle="#f0a24a";g.lineWidth=1.2;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(a[0]+(bx-a[0])*al,a[1]+(by-a[1])*al);g.stroke();
+  g.globalAlpha=al;glow(bx,by,Math.max(8,2.2*z*3.5),"rgba(224,140,58,A)",.45*al);g.fillStyle="#f0a24a";g.beginPath();g.arc(bx,by,Math.max(1.8,1.4*z),0,6.283);g.fill();g.globalAlpha=1}
+ for(var i=0;i<S.length;i++){var q=P(i),r=Math.max(2.2,Math.min(9,2.2*z)),has=ans[i]!==undefined,cur=(i===idx&&phase==="ask"),vis=i===0?1:(lines[i-1]||0);if(vis<=0)continue;g.globalAlpha=vis;
+  if(!has){g.fillStyle="#fff";g.beginPath();g.arc(q[0],q[1],r,0,6.283);g.fill();if(cur||phase==="intro")glow(q[0],q[1],r*(cur?7+Math.sin(t*3)*1.2:5),"rgba(226,188,104,A)",cur?.55:.4)}
   else if(ans[i]){glow(q[0],q[1],r*6,"rgba(226,188,104,A)",.6);g.fillStyle="#f1cd7c";g.beginPath();g.arc(q[0],q[1],r*1.15,0,6.283);g.fill()}
-  else{var pu=.75+.25*Math.sin(t*3+i);glow(q[0],q[1],r*6*pu,"rgba(224,140,58,A)",.5);g.strokeStyle="#f0a24a";g.lineWidth=1.8;g.beginPath();g.arc(q[0],q[1],r*1.5*pu,0,6.283);g.stroke();g.fillStyle="#f0a24a";g.beginPath();g.arc(q[0],q[1],r*.6,0,6.283);g.fill();g.lineWidth=1}
-  if(phase==="done"||(has&&z<1.2)){g.fillStyle="rgba(230,236,248,.9)";g.font="600 "+Math.max(11,Math.min(14,z*18))+"px Inter,sans-serif";g.textAlign="center";var dx=S[i][0],dy=S[i][1],dl=Math.sqrt(dx*dx+dy*dy)||1;dx/=dl;dy/=dl;g.textAlign=dx>.35?"left":dx<-.35?"right":"center";g.fillText(Q[i][1],q[0]+dx*16,q[1]+dy*18+4)}}
+  else{var pu=.75+.25*Math.sin(t*3+i);glow(q[0],q[1],r*7*pu,"rgba(224,140,58,A)",.6);g.strokeStyle="#f0a24a";g.lineWidth=2;g.beginPath();g.arc(q[0],q[1],r*1.8*pu,0,6.283);g.stroke();g.fillStyle="#f0a24a";g.beginPath();g.arc(q[0],q[1],r*.8,0,6.283);g.fill();g.lineWidth=1}
+  g.globalAlpha=1;
+  if(phase==="done"){var cx=0,cy=0;S.forEach(function(p){cx+=p[0];cy+=p[1]});cx/=S.length;cy/=S.length;var dx=S[i][0]-cx,dy=S[i][1]-cy,dl=Math.sqrt(dx*dx+dy*dy)||1;dx/=dl;dy/=dl;
+   g.fillStyle="rgba(230,236,248,.9)";g.font="600 "+Math.max(11,Math.min(14,z*18))+"px Inter,sans-serif";g.textAlign=dx>.35?"left":dx<-.35?"right":"center";g.fillText(Q[i][1],q[0]+dx*16,q[1]+dy*18+4)}}
  if(!reduce&&!anim){}
 }
 addEventListener("resize",size);
