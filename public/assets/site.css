@@ -9,8 +9,9 @@
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
 img{max-width:100%;height:auto;display:block}
-a{color:var(--gold);text-underline-offset:3px}
-a:hover{color:var(--gold-hi)}
+a{color:var(--gold);text-decoration:none}
+a:hover{color:var(--gold-hi);text-decoration:underline;text-underline-offset:3px}
+a.btn:hover,a.lnkcard:hover,.menu a:hover,.brand:hover,.cx a:hover{text-decoration:none}
 h1,h2,h3{font-family:var(--serif);font-weight:700;line-height:1.12;margin:0;letter-spacing:-.01em}
 h1{font-size:clamp(34px,6.4vw,68px)}
 h2{font-size:clamp(26px,4vw,40px);margin-bottom:14px}
@@ -189,3 +190,5 @@ a.lnkcard{display:block;text-decoration:none;color:inherit;transition:border-col
 a.lnkcard:hover{border-color:var(--gold);transform:translateY(-2px);color:inherit}
 a.lnkcard .more{display:inline-block;margin-top:14px;color:var(--gold);font-weight:600}
 a.lnkcard .more::after{content:" \2192"}
+
+a.lnkcard,a.lnkcard *{text-decoration:none!important}
