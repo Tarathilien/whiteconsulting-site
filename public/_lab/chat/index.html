@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conversational home (prototype)</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+body{min-height:100vh;background:#0B1426 url("/assets/img/hero-sm.jpg") center top/cover fixed no-repeat}
+@media(min-width:900px){body{background-image:url("/assets/img/hero.jpg")}}
+body::before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(8,14,28,.55),rgba(8,14,28,.9));z-index:0}
+.lab{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:22px 18px 40px;min-height:100vh;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:12px;padding:6px 0 18px}
+.bar img{width:36px}.bar b{font-family:var(--serif);font-size:19px}
+.bar .proto{margin-left:auto;font-size:12px;border:1px solid var(--line);border-radius:99px;padding:4px 10px;color:var(--muted)}
+.log{flex:1;display:flex;flex-direction:column;gap:12px;padding-bottom:10px}
+.m{max-width:88%;padding:13px 16px;border-radius:16px;line-height:1.5;animation:in .35s ease both}
+.m.bot{background:rgba(20,35,60,.92);border:1px solid var(--line);border-top-left-radius:4px}
+.m.you{align-self:flex-end;background:var(--gold);color:#0B1426;font-weight:600;border-top-right-radius:4px}
+.m.big{font-family:var(--serif);font-size:clamp(22px,4vw,28px);font-weight:700;line-height:1.2}
+.dots{display:inline-flex;gap:5px}.dots i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:b 1s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,80%,100%{opacity:.3}40%{opacity:1}}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.opts{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 6px;animation:in .35s ease both}
+.opts button{background:rgba(11,20,38,.85);border:1.5px solid var(--gold);color:var(--gold);padding:11px 16px;border-radius:99px;font:inherit;font-weight:600;font-size:15.5px;cursor:pointer;text-align:left}
+.opts button:hover{background:var(--gold);color:#0B1426}
+.proof{background:rgba(20,35,60,.92);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;padding:14px 16px;max-width:92%;animation:in .35s ease both}
+.proof .tag{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.proof p{margin:6px 0 0;color:var(--muted);font-size:15.5px}
+.say{display:flex;gap:10px;margin-top:10px}
+.say input{flex:1;background:rgba(14,26,49,.95);border:1px solid var(--line);color:var(--ink);border-radius:99px;padding:13px 18px;font:inherit;font-size:16px}
+.say button{border:0;background:var(--gold);color:#0B1426;border-radius:99px;padding:0 20px;font:inherit;font-weight:600;cursor:pointer}
+.note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:14px}
+@media(prefers-reduced-motion:reduce){.m,.opts,.proof{animation:none}.dots i{animation:none}}
+</style></head><body>
+<div class="lab">
+<div class="bar"><img src="/assets/img/logo.png" alt=""><b>Jared White Consulting</b><span class="proto">Prototype</span></div>
+<div class="log" id="log" aria-live="polite"></div>
+<form class="say" id="say"><input id="txt" type="text" placeholder="Or type what is on your mind" autocomplete="off" aria-label="Type a message"><button>Send</button></form>
+<p class="note">Scripted prototype for design review. No AI is connected, and nothing you type is saved.</p>
+</div>
+<script>
+(function(){
+var log=document.getElementById("log"),st={topic:"",org:"",size:""};
+var BOOK="https://calendar.app.google/3gdVnfZjGvbq7phD7";
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function down(){window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})}
+function add(cls,html){var d=document.createElement("div");d.className=cls;d.innerHTML=html;log.appendChild(d);down();return d}
+function bot(html,cls,cb){var t=add("m bot",'<span class="dots"><i></i><i></i><i></i></span>');setTimeout(function(){t.className="m bot"+(cls?" "+cls:"");t.innerHTML=html;down();if(cb)cb()},650)}
+function opts(list,fn){var d=document.createElement("div");d.className="opts";list.forEach(function(x){var b=document.createElement("button");b.type="button";b.textContent=x[0];b.onclick=function(){d.remove();add("m you",esc(x[0]));fn(x[1],x[0])};d.appendChild(b)});log.appendChild(d);down()}
+var PROOF={
+ ai:['AI rules and data','Most small teams are already using AI with no written rules. The first fix is usually simple: one approved-tools list, one page of rules, and a short staff acknowledgment.'],
+ it:['Habitat for Humanity of Greater Jonesboro','Email had been down for 6 weeks while they waited on grant funding news. I restored it in 5 days, and grant and funding communications were flowing again.'],
+ funder:['Funder and board questions','Funders increasingly ask whether you have an AI policy and how data is handled. A written policy and a training record are what they want to see.'],
+ look:['Agape House of Paragould','Months without access to their domain and Google Workspace. Fixed in under two weeks, and they can now manage their own email accounts.']
+};
+function start(){
+ bot("What is keeping you up at night?","big",function(){
+  bot("Pick the closest one, or type your own below.",null,function(){
+   opts([["Staff use ChatGPT and we have no rules","ai"],["Email or accounts are a mess","it"],["A funder or board asked about AI","funder"],["Just looking around","look"]],function(v){st.topic=v;org()})
+  })
+ })
+}
+function org(){bot("Got it. What kind of organization are you?",null,function(){opts([["Nonprofit","Nonprofit"],["Small business","Small business"],["Something else","Other"]],function(v){st.org=v;size()})})}
+function size(){bot("And about how many people work with you, staff and regular volunteers?",null,function(){opts([["1 to 5","1 to 5"],["6 to 20","6 to 20"],["21 to 50","21 to 50"],["51 or more","51 or more"]],function(v){st.size=v;insight()})})}
+function insight(){
+ var p=PROOF[st.topic];
+ bot("Thanks. For a "+esc(st.org.toLowerCase())+" with "+esc(st.size)+" people, this is where I would look first.",null,function(){
+  var d=document.createElement("div");d.className="proof";d.innerHTML='<span class="tag">'+p[0]+'</span><p>'+p[1]+'</p>';log.appendChild(d);down();
+  bot("I can turn your answers into a free report with your ranked gaps and fixes. About 3 more minutes, and I already have your basics.",null,function(){
+   opts([["Build my free report","go"],["I would rather talk to Jared","talk"]],function(v){
+    if(v==="go"){bot("In the real version, this opens the unified assessment with your answers carried over, and ends in one report emailed to you.")}
+    else{bot('Here is his calendar: <a href="'+BOOK+'">book a free 20-minute call</a>.')}
+   })
+  })
+ })
+}
+document.getElementById("say").onsubmit=function(e){e.preventDefault();var i=document.getElementById("txt"),v=i.value.replace(/^\s+|\s+$/g,"");if(!v)return;i.value="";add("m you",esc(v));
+ bot("In the real version I would answer that directly and point you to the right next step. For this prototype, tap one of the options above or restart the page.")};
+start();
+})();
+</script></body></html>
