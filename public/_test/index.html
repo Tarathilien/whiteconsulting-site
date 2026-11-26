@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Backend POST test</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;background:#0B1426;color:#eee;max-width:760px;margin:32px auto;padding:0 16px}
+button{background:#D4A84B;border:0;padding:10px 16px;border-radius:6px;font-weight:600;margin:4px 6px 4px 0;cursor:pointer}
+pre{background:#111c33;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-word}
+</style>
+</head>
+<body>
+<h1>Backend POST test</h1>
+<p>Sends test submissions from this origin. Test addresses only.</p>
+<button id="q1">Quiz: JSON as text/plain</button>
+<button id="q2">Quiz: form-encoded</button>
+<button id="t1">Tech check: JSON as text/plain</button>
+<button id="t2">Tech check: form-encoded</button>
+<pre id="out">Ready.</pre>
+<script>
+var QUIZ="https://script.google.com/macros/s/AKfycbxodVJniJyPA3FdbvwVbN_rg6ROFeX9YhcNDCxNRkwogw_J7_M9CK3VmIgfMjbseqM6/exec";
+var PLAN="https://script.google.com/macros/s/AKfycbxNfdW7RQs2vMLk15JgjQvBICRjdt6DZB6HC8109dbT2JqrcdbOFCsuDmu68IiftiqQ/exec";
+var out=document.getElementById("out");
+function log(s){out.textContent+="\n"+s;}
+function quizData(n){return {organization:"Test Org",name:"Jared WhiteTest",email:"jaredwhite2005+test"+n+"@gmail.com",orgType:"nonprofit",staffCount:"1-9",gate:"no",dataTypes:["children"],funding:["donations"],aiTools:"",consent:true,website:""};}
+function planData(n){return {name:"Jared WhiteTest",email:"jaredwhite2005+test"+n+"@gmail.com",organization:"Test Org",consent:true,website:""};}
+function send(label,url,data,mode){
+  var opts={method:"POST"};
+  if(mode==="json"){opts.headers={"Content-Type":"text/plain;charset=utf-8"};opts.body=JSON.stringify(data);}
+  else{var p=new URLSearchParams();for(var k in data){p.append(k,Array.isArray(data[k])?data[k].join(", "):data[k]);}opts.body=p;}
+  log("-> "+label);
+  fetch(url,opts).then(function(r){return r.text().then(function(t){log("<- "+label+" status "+r.status+": "+t.slice(0,400));});}).catch(function(e){log("<- "+label+" FAILED: "+e);});
+}
+document.getElementById("q1").onclick=function(){send("quiz json",QUIZ,quizData(1),"json");};
+document.getElementById("q2").onclick=function(){send("quiz form",QUIZ,quizData(1),"form");};
+document.getElementById("t1").onclick=function(){send("tech json",PLAN,planData(2),"json");};
+document.getElementById("t2").onclick=function(){send("tech form",PLAN,planData(2),"form");};
+</script>
+</body>
+</html>
