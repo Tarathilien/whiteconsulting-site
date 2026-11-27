@@ -86,3 +86,6 @@ if(window.ResizeObserver){new ResizeObserver(size).observe(stage)}else{addEventL
 stage.addEventListener("pointermove",function(e){var r=stage.getBoundingClientRect();px=((e.clientX-r.left)/W-.5)*70;py=((e.clientY-r.top)/H-.5)*40});
 build();size();intro();requestAnimationFrame(function(ts){t0=ts;last=ts;frame(ts)});
 })();
+
+(function(){var t=document.getElementById("take"),h=document.getElementById("jhero"),st=document.getElementById("journey");if(!t||!h||!st)return;
+t.addEventListener("click",function(){h.classList.add("gone");st.removeAttribute("inert");h.setAttribute("aria-hidden","true");var sec=document.getElementById("journey-section");if(sec)sec.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(function(){h.style.display="none"},900)})})();
