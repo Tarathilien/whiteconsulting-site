@@ -2,6 +2,7 @@
   "name": "whiteconsulting-site",
   "compatibility_date": "2026-11-25",
   "assets": {
-    "directory": "./public"
+    "directory": "./public",
+    "not_found_handling": "404-page"
   }
 }
