@@ -42,7 +42,7 @@ var PRIORITY=[0,2,1,4,3,5,6,7],BOOK="https://calendar.app.google/3gdVnfZjGvbq7ph
 var S=[[0,0]],B=[],X=[],webT=0,heading=.6;
 var c=document.getElementById("sky"),g=c.getContext("2d"),card=document.getElementById("card"),W,H,dpr=Math.min(devicePixelRatio||1,1.5);
 var reduce=matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-var par=[],M=[.85],cam={x:0,y:0,z:1.25},px=0,py=0,anim=null,idx=-1,ans=[],lines=[],seed=11,layers=[],fit=.5,phase="intro",t0=0,last=0;
+var fin=false,bF=0,par=[],M=[.85],cam={x:0,y:0,z:1.25},px=0,py=0,anim=null,idx=-1,ans=[],lines=[],seed=11,layers=[],fit=.5,phase="intro",t0=0,last=0;
 function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
 function size(){W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;g.setTransform(dpr,0,0,dpr,0,0);fit=.5}
 function build(){var n=[230,170,120],d=[.15,.4,.7],r=[.7,1.1,1.7];for(var l=0;l<3;l++){var a=[];for(var i=0;i<n[l];i++)a.push({x:(rnd()-.5)*5000,y:(rnd()-.5)*3200,r:r[l]*(.6+rnd()*.9),p:rnd()*6.28});layers.push({d:d[l],s:a})}}
@@ -72,7 +72,7 @@ function stub(i,v){var base=i<7?Math.atan2(S[i+1][1]-S[i][1],S[i+1][0]-S[i][0]):
  B.push({from:i,x:S[i][0]+Math.cos(a)*L,y:S[i][1]+Math.sin(a)*L,t0:performance.now()/1000,dim:!!v})}
 function answer(v){ans[idx]=v;card.className="card off";var i=idx;
  if(i<7){S.push(nextPos(i,v));stub(i,v);idx++;phase="fly";anim={a:{x:cam.x,y:cam.y,z:cam.z},b:focus(idx),t:0,dur:reduce?.01:2.0,dip:reduce?0:1.0,seg:i,cb:ask}}
- else{stub(i,v);phase="fly";lines[7]=1;var mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;S.concat(B.map(function(b){return[b.x,b.y]})).forEach(function(p){mnx=Math.min(mnx,p[0]);mxx=Math.max(mxx,p[0]);mny=Math.min(mny,p[1]);mxy=Math.max(mxy,p[1])});
+ else{fin=true;phase="fly";lines[7]=1;var mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;S.forEach(function(p){mnx=Math.min(mnx,p[0]);mxx=Math.max(mxx,p[0]);mny=Math.min(mny,p[1]);mxy=Math.max(mxy,p[1])});
   var hw=(mxx-mnx)/2+110,hh2=(mxy-mny)/2+80,z=Math.min(W*.52/hw,H*.27/hh2,2.4);fly({x:(mnx+mxx)/2,y:(mny+mxy)/2,z:z},3.2,0,finish)}}
 function finish(){phase="done";var gaps=PRIORITY.filter(function(i){return !ans[i]});
  var pairs=[];for(var i=0;i<8;i++)for(var j=i+1;j<8;j++)if(par[j]!==i&&par[i]!==j)pairs.push([i,j,Math.hypot(S[i][0]-S[j][0],S[i][1]-S[j][1])]);
@@ -85,6 +85,7 @@ function glow(x,y,r,col,a){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColo
 function frame(ts){requestAnimationFrame(frame);if(document.hidden)return;var dt=Math.min(.05,(ts-last)/1000||0);last=ts;var t=(ts-t0)/1000;
  if(anim){anim.t+=dt/anim.dur;var k=Math.min(1,anim.t),e=ease(k);cam.x=anim.a.x+(anim.b.x-anim.a.x)*e;cam.y=anim.a.y+(anim.b.y-anim.a.y)*e;cam.z=anim.a.z+(anim.b.z-anim.a.z)*e-anim.dip*Math.sin(Math.PI*k)*Math.min(1,anim.a.z);
   if(anim.seg!=null)lines[anim.seg]=e;if(k>=1){if(anim.seg!=null)lines[anim.seg]=1;var cb=anim.cb;anim=null;if(cb)cb()}}
+if(fin)bF=Math.min(1,bF+dt/1.4);
  if(phase==="done")webT=Math.min(1,webT+dt/2.8);var ay=H*.34,ax=W/2;
  var gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,"#050a17");gr.addColorStop(1,"#0f1c38");g.fillStyle=gr;g.fillRect(0,0,W,H);
  for(var l=0;l<3;l++){var L=layers[l],sc=1+(cam.z-1)*L.d;sc=Math.max(.25,sc);g.fillStyle="#fff";
@@ -97,7 +98,7 @@ function frame(ts){requestAnimationFrame(frame);if(document.hidden)return;var dt
  g.lineWidth=1;
  if(webT>0){g.strokeStyle="rgba(226,188,104,"+(.7*webT)+")";for(var j=0;j<X.length;j++){var a=P(X[j][0]),b=P(X[j][1]);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(a[0]+(b[0]-a[0])*webT,a[1]+(b[1]-a[1])*webT);g.stroke()}}
  var now=ts/1000;
- for(var k=0;k<B.length;k++){var bb=B[k],al=Math.min(1,Math.max(0,(now-bb.t0)/1.4)),a=P(bb.from),bx=ax+(bb.x-cam.x)*z,by=ay+(bb.y-cam.y)*z;
+ for(var k=0;k<B.length;k++){var bb=B[k],al=Math.min(1,Math.max(0,(now-bb.t0)/1.4))*(1-bF);if(al<=0)continue;var a=P(bb.from),bx=ax+(bb.x-cam.x)*z,by=ay+(bb.y-cam.y)*z;
   g.globalAlpha=(bb.dim?.32:.65)*al;g.strokeStyle=bb.dim?"#e2bc68":"#f0a24a";g.lineWidth=1.2;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(a[0]+(bx-a[0])*al,a[1]+(by-a[1])*al);g.stroke();
   g.globalAlpha=bb.dim?al*.5:al;glow(bx,by,Math.max(8,2.2*z*3.5),"rgba(224,140,58,A)",.45*al);g.fillStyle=bb.dim?"#e2bc68":"#f0a24a";g.beginPath();g.arc(bx,by,Math.max(1.8,1.4*z),0,6.283);g.fill();g.globalAlpha=1}
  for(var i=0;i<S.length;i++){var q=P(i),r=Math.max(2.2,Math.min(9,2.2*z))*(.7+.6*(M[i]||.8)),has=ans[i]!==undefined,cur=(i===idx&&phase==="ask"),vis=i===0?1:(lines[i-1]||0);if(vis<=0)continue;g.globalAlpha=vis;
