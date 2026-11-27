@@ -12,7 +12,7 @@ var Q=[
 ["Do you have a technology budget or plan for the next 12 months?","Budget","Surprise replacements and renewals land on the budget at the worst moments."]];
 var PRIORITY=[0,2,1,4,3,5,6,7],BOOK="https://calendar.app.google/3gdVnfZjGvbq7phD7";
 var S=[[0,0]],B=[],X=[],webT=0,heading=.6;
-var stage=document.getElementById("journey");if(!stage)return;var c=document.createElement("canvas");c.className="j-sky";c.setAttribute("aria-hidden","true");stage.appendChild(c);var card=document.createElement("div");card.className="j-card";card.setAttribute("aria-live","polite");stage.appendChild(card);var g=c.getContext("2d"),W,H,vis=true,dpr=Math.min(devicePixelRatio||1,1.5);
+var stage=document.getElementById("journey");if(!stage)return;var c=document.createElement("canvas");c.className="j-sky";c.setAttribute("aria-hidden","true");stage.appendChild(c);var card=document.createElement("div");card.className="j-card";card.setAttribute("aria-live","polite");stage.appendChild(card);var g=c.getContext("2d"),W,H,inView=true,dpr=Math.min(devicePixelRatio||1,1.5);
 var reduce=matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 var fin=false,bF=0,par=[],M=[.85],cam={x:0,y:0,z:1.25},px=0,py=0,anim=null,idx=-1,ans=[],lines=[],seed=11,layers=[],fit=.5,phase="intro",t0=0,last=0;
 function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
@@ -54,7 +54,7 @@ function finish(){phase="done";var gaps=PRIORITY.filter(function(i){return !ans[
  h+='<div class="j-row"><button class="j-solid" id="em">Email me this path</button><a href="'+BOOK+'">Book a free call</a></div><p class="j-fine">Preview: the emailed report comes with the final assessment.</p>';
  card.className="j-card";card.innerHTML=h;document.getElementById("em").onclick=function(){this.textContent="Coming with the final version"}}
 function glow(x,y,r,col,a){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col.replace("A",a));gr.addColorStop(1,col.replace("A",0));g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,6.283);g.fill()}
-function frame(ts){requestAnimationFrame(frame);if(document.hidden||!vis)return;var dt=Math.min(.05,(ts-last)/1000||0);last=ts;var t=(ts-t0)/1000;
+function frame(ts){requestAnimationFrame(frame);if(document.hidden||!inView)return;var dt=Math.min(.05,(ts-last)/1000||0);last=ts;var t=(ts-t0)/1000;
  if(anim){anim.t+=dt/anim.dur;var k=Math.min(1,anim.t),e=ease(k);cam.x=anim.a.x+(anim.b.x-anim.a.x)*e;cam.y=anim.a.y+(anim.b.y-anim.a.y)*e;cam.z=anim.a.z+(anim.b.z-anim.a.z)*e-anim.dip*Math.sin(Math.PI*k)*Math.min(1,anim.a.z);
   if(anim.seg!=null)lines[anim.seg]=e;if(k>=1){if(anim.seg!=null)lines[anim.seg]=1;var cb=anim.cb;anim=null;if(cb)cb()}}
 if(fin)bF=Math.min(1,bF+dt/1.4);
@@ -82,7 +82,7 @@ if(fin)bF=Math.min(1,bF+dt/1.4);
    g.fillStyle="rgba(230,236,248,.9)";g.font="600 "+Math.max(11,Math.min(14,z*18))+"px Inter,sans-serif";g.textAlign=dx>.35?"left":dx<-.35?"right":"center";var lx=q[0]+dx*16,ly=q[1]+dy*18+4,tw=g.measureText(Q[i][1]).width;if(g.textAlign==="left"){lx=Math.min(lx,W-8-tw)}else if(g.textAlign==="right"){lx=Math.max(lx,8+tw)}else{lx=Math.max(8+tw/2,Math.min(W-8-tw/2,lx))}g.fillText(Q[i][1],lx,ly)}}
  if(!reduce&&!anim){}
 }
-if(window.ResizeObserver){new ResizeObserver(size).observe(stage)}else{addEventListener("resize",size)}if(window.IntersectionObserver){new IntersectionObserver(function(e){vis=e[0].isIntersecting}).observe(stage)}
+if(window.ResizeObserver){new ResizeObserver(size).observe(stage)}else{addEventListener("resize",size)}if(window.IntersectionObserver){new IntersectionObserver(function(e){inView=e[0].isIntersecting}).observe(stage)}
 stage.addEventListener("pointermove",function(e){var r=stage.getBoundingClientRect();px=((e.clientX-r.left)/W-.5)*70;py=((e.clientY-r.top)/H-.5)*40});
 build();size();intro();requestAnimationFrame(function(ts){t0=ts;last=ts;frame(ts)});
 })();
