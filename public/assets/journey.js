@@ -88,4 +88,8 @@ build();size();intro();requestAnimationFrame(function(ts){t0=ts;last=ts;frame(ts
 })();
 
 (function(){var t=document.getElementById("take"),h=document.getElementById("jhero"),st=document.getElementById("journey");if(!t||!h||!st)return;
-t.addEventListener("click",function(){h.classList.add("gone");st.removeAttribute("inert");h.setAttribute("aria-hidden","true");var sec=document.getElementById("journey-section");if(sec)sec.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(function(){h.style.display="none"},900)})})();
+function go(){if(h.classList.contains("gone"))return;h.classList.add("gone");st.removeAttribute("inert");h.setAttribute("aria-hidden","true");var sec=document.getElementById("journey-section");if(sec)sec.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(function(){h.style.display="none"},900)}
+t.addEventListener("click",go);
+var links=document.querySelectorAll('a[href="#journey-section"]');for(var i=0;i<links.length;i++)links[i].addEventListener("click",function(e){e.preventDefault();var sec=document.getElementById("journey-section");if(h.classList.contains("gone")){if(sec)sec.scrollIntoView({behavior:"smooth",block:"start"})}else go()});
+if(location.hash==="#journey-section")setTimeout(go,150);
+addEventListener("hashchange",function(){if(location.hash==="#journey-section")go()});})();
