@@ -204,8 +204,8 @@ a.more::after{content:" \2192"}
 
 /* constellation journey */
 #journey-section{padding:0;scroll-margin-top:56px}
-.j-wrap{position:relative}
-.j-stage{position:relative;height:clamp(640px,calc(100vh - 64px),780px);overflow:hidden;background:#050a17;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.j-wrap{position:relative;display:grid}
+.j-stage{grid-area:1/1;position:relative;min-height:clamp(640px,calc(100vh - 64px),780px);overflow:hidden;background:#050a17;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .j-sky{position:absolute;inset:0;width:100%;height:100%;display:block}
 .j-card{z-index:3;position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(640px,calc(100% - 28px));background:rgba(12,22,42,.9);border:1px solid var(--line);border-radius:18px;padding:20px 22px;max-height:40%;overflow:auto;backdrop-filter:blur(6px);transition:opacity .5s,transform .5s}
 .j-card.off{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(16px)}
@@ -221,7 +221,7 @@ a.more::after{content:" \2192"}
 .j-head{z-index:2;position:absolute;left:0;right:0;top:0;padding:22px 20px 0;text-align:center;pointer-events:none}
 .j-head .eyebrow{margin-bottom:4px}
 
-.j-hero{position:absolute;inset:0;z-index:5;min-height:0;transition:opacity .8s ease,visibility .8s}
+.j-hero{grid-area:1/1;position:relative;z-index:5;min-height:0;transition:opacity .8s ease,visibility .8s}
 .j-hero .wrap{padding-top:40px;padding-bottom:40px}
 .j-hero.gone{opacity:0;visibility:hidden;pointer-events:none}
 #journey-section{scroll-margin-top:56px}

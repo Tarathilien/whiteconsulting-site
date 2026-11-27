@@ -14,7 +14,7 @@ var PRIORITY=[0,2,1,4,3,5,6,7],BOOK="https://calendar.app.google/3gdVnfZjGvbq7ph
 var S=[[0,0]],B=[],X=[],webT=0,heading=.6;
 var stage=document.getElementById("journey");if(!stage)return;var c=document.createElement("canvas");c.className="j-sky";c.setAttribute("aria-hidden","true");stage.appendChild(c);var card=document.createElement("div");card.className="j-card";card.setAttribute("aria-live","polite");stage.appendChild(card);var g=c.getContext("2d"),W,H,inView=true,dpr=Math.min(devicePixelRatio||1,1.5);
 var reduce=matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-var fin=false,bF=0,par=[],M=[.85],cam={x:0,y:0,z:1.25},px=0,py=0,anim=null,idx=-1,ans=[],lines=[],seed=11,layers=[],fit=.5,phase="intro",t0=0,last=0;
+var slow=0,fin=false,bF=0,par=[],M=[.85],cam={x:0,y:0,z:1.25},px=0,py=0,anim=null,idx=-1,ans=[],lines=[],seed=11,layers=[],fit=.5,phase="intro",t0=0,last=0;
 function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
 function size(){W=stage.clientWidth||600;H=stage.clientHeight||600;c.width=W*dpr;c.height=H*dpr;g.setTransform(dpr,0,0,dpr,0,0);fit=.5}
 function build(){var n=[230,170,120],d=[.15,.4,.7],r=[.7,1.1,1.7];for(var l=0;l<3;l++){var a=[];for(var i=0;i<n[l];i++)a.push({x:(rnd()-.5)*5000,y:(rnd()-.5)*3200,r:r[l]*(.6+rnd()*.9),p:rnd()*6.28});layers.push({d:d[l],s:a})}}
@@ -54,7 +54,7 @@ function finish(){phase="done";var gaps=PRIORITY.filter(function(i){return !ans[
  h+='<div class="j-row"><button class="j-solid" id="em">Email me this path</button><a href="'+BOOK+'">Book a free call</a></div><p class="j-fine">Preview: the emailed report comes with the final assessment.</p>';
  card.className="j-card";card.innerHTML=h;document.getElementById("em").onclick=function(){this.textContent="Coming with the final version"}}
 function glow(x,y,r,col,a){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col.replace("A",a));gr.addColorStop(1,col.replace("A",0));g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,6.283);g.fill()}
-function frame(ts){requestAnimationFrame(frame);if(document.hidden||!inView)return;var dt=Math.min(.05,(ts-last)/1000||0);last=ts;var t=(ts-t0)/1000;
+function frame(ts){requestAnimationFrame(frame);if(document.hidden||!inView||stage.hasAttribute("inert"))return;var raw=(ts-last)/1000||0;if(!reduce&&anim){if(raw>.06){slow++;if(slow>25){reduce=true;dpr=1;size()}}else if(slow>0)slow-=.25}var dt=Math.min(.05,raw);last=ts;var t=(ts-t0)/1000;
  if(anim){anim.t+=dt/anim.dur;var k=Math.min(1,anim.t),e=ease(k);cam.x=anim.a.x+(anim.b.x-anim.a.x)*e;cam.y=anim.a.y+(anim.b.y-anim.a.y)*e;cam.z=anim.a.z+(anim.b.z-anim.a.z)*e-anim.dip*Math.sin(Math.PI*k)*Math.min(1,anim.a.z);
   if(anim.seg!=null)lines[anim.seg]=e;if(k>=1){if(anim.seg!=null)lines[anim.seg]=1;var cb=anim.cb;anim=null;if(cb)cb()}}
 if(fin)bF=Math.min(1,bF+dt/1.4);
