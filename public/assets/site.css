@@ -203,10 +203,10 @@ a.more{display:inline-block;margin-top:14px;color:var(--gold);font-weight:600}
 a.more::after{content:" \2192"}
 
 /* constellation journey */
-#journey-section{padding:0}
-.j-stage{position:relative;height:clamp(560px,82vh,720px);overflow:hidden;background:#050a17;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+#journey-section{padding:0;scroll-margin-top:56px}
+.j-stage{position:relative;height:clamp(560px,calc(100vh - 64px),760px);overflow:hidden;background:#050a17;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .j-sky{position:absolute;inset:0;width:100%;height:100%;display:block}
-.j-card{z-index:3;position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(640px,calc(100% - 28px));background:rgba(12,22,42,.9);border:1px solid var(--line);border-radius:18px;padding:20px 22px;max-height:48%;overflow:auto;backdrop-filter:blur(6px);transition:opacity .5s,transform .5s}
+.j-card{z-index:3;position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(640px,calc(100% - 28px));background:rgba(12,22,42,.9);border:1px solid var(--line);border-radius:18px;padding:20px 22px;max-height:40%;overflow:auto;backdrop-filter:blur(6px);transition:opacity .5s,transform .5s}
 .j-card.off{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(16px)}
 .j-qn{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px}
 .j-qt{font-family:var(--serif);font-weight:700;font-size:clamp(20px,3.4vw,26px);line-height:1.25;margin:0 0 16px}
