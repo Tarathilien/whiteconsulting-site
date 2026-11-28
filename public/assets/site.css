@@ -228,3 +228,5 @@ a.more::after{content:" \2192"}
 #work{scroll-margin-top:60px}
 .addon{margin:6px 0 18px;padding:12px 14px;border:1px dashed rgba(212,168,75,.55);border-radius:10px;font-size:15px;line-height:1.5;color:var(--muted)}
 .addon b{color:var(--gold);font-weight:600}
+
+#ai-risk{scroll-margin-top:60px}
