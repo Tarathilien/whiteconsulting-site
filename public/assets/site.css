@@ -231,5 +231,6 @@ a.more::after{content:" \2192"}
 
 #ai-risk{scroll-margin-top:60px}
 
-.nav .wrap{gap:18px}.brand{white-space:nowrap;flex-shrink:0}
+@media(min-width:761px){.nav .wrap{gap:18px}.brand{white-space:nowrap;flex-shrink:0}}
+@media(max-width:760px){.nav .wrap{gap:10px}.brand{min-width:0}.burger{flex-shrink:0}}
 @media(min-width:761px) and (max-width:1000px){.menu{gap:15px}.menu a{font-size:15px}.menu .cta{padding:8px 12px}.brand{font-size:17px}}
